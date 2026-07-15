@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>myWay</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .map {
+            height: 60%;
+            background: lightblue;
+        }
+
+        #divider {
+            height: 10px;
+            background: gray;
+            cursor: row-resize;
+            touch-action: none;
+        }
+
+        .driveInfo {
+            height: calc(40% - 10px);
+            background: whitesmoke;
+        }
+    </style>
+</head>
+
+<body style="margin: 0; padding: 0;">
+    <div class="map">
+
+    </div>
+
+    <div id="divider"></div>
+
+    <div class="driveInfo">
+        <h1>!!!</h1>
+    </div>
+
+</body>
+<script>
+    const divider = document.getElementById("divider");
+    const map = document.querySelector(".map");
+    const info = document.querySelector(".driveInfo");
+
+    let dragging = false;
+
+    divider.addEventListener("pointerdown", () => {
+        dragging = true;
+    });
+
+    window.addEventListener("pointerup", () => {
+        dragging = false;
+    });
+
+    window.addEventListener("pointermove", (e) => {
+
+        if (!dragging) return;
+
+        let y = e.clientY;
+
+        map.style.height = y + "px";
+
+        info.style.height =
+            (window.innerHeight - y - divider.offsetHeight) + "px";
+
+    });
+</script>
+
+</html>

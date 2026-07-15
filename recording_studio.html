@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Записи скорости</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td,
+        th {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: center;
+        }
+
+        button {
+            padding: 8px 15px;
+            font-size: 16px;
+        }
+
+        .home {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <div>
+    <h2>🎤 Записи для каждой скорости</h2>
+    <button class="home" onclick="window.location.href='index.html'">🏠</button>
+</div>
+    <table>
+
+        <tr>
+            <th>Скорость</th>
+            <th>Запись</th>
+            <th>редактировать</th>
+            <th>удалить</th>
+        </tr>
+
+
+        <tbody id="table">
+
+        </tbody>
+
+    </table>
+
+
+    <script>
+
+        let table = document.getElementById("table");
+        let request = indexedDB.open("VoiceRecorder", 1);
+        let db;
+
+
+        for (let speed = 10; speed <= 130; speed += 10) {
+
+            let row = document.createElement("tr");
+            row.innerHTML = `
+            <td>
+                ${speed} км/ч
+            </td>
+            <td id = "audio${speed}">
+                🎤 Нет записи
+            </td>
+
+            <td>
+                <button onclick="edit(${speed})">
+                    🖉
+                </button>
+            </td>
+
+            <td id = "delite${speed}">
+            </td>
+            `;
+
+
+            table.appendChild(row);
+
+        }
+
+        request.onupgradeneeded = function (event) {
+            db = event.target.result;
+
+            db.createObjectStore("audio", {
+                keyPath: "id",
+                autoIncrement: true
+            });
+        };
+
+        request.onsuccess = function (event) {
+
+            db = event.target.result;
+            let transaction = db.transaction(["audio"], "readonly");
+
+            let store = transaction.objectStore("audio");
+
+            store.getAll().onsuccess = function (e) {
+                console.log(e.target.result);
+            };
+
+
+            loadAudio();
+
+        };
+
+        function loadAudio() {
+
+            let transaction = db.transaction(["audio"], "readonly");
+
+            let store = transaction.objectStore("audio");
+
+            store.openCursor().onsuccess = function (event) {
+
+                let cursor = event.target.result;
+
+                if (cursor) {
+
+                    console.log(cursor);
+                    uploadAudio(cursor.value.speed, cursor.value.audio)
+
+                    cursor.continue();
+
+                }
+
+            };
+
+        }
+
+        function delite(speed){
+            let transaction = db.transaction(["audio"], "readonly");
+
+            let store = transaction.objectStore("audio");
+
+            store.openCursor().onsuccess = function (event) {
+
+                let cursor = event.target.result;
+
+                if (cursor) {
+                    cursor.delete(); 
+                    loadAudio();
+                    
+                }
+
+            };
+        }
+
+
+        function uploadAudio(speed, blob) {
+            console.log(speed, blob);
+            let audioElement = document.getElementById(`audio${speed}`);
+
+            audioElement.innerHTML="";
+            let url = URL.createObjectURL(blob);
+            let audio = document.createElement("audio");
+
+            audio.controls = true;
+            audio.src = url;
+
+            document.getElementById(`delite${speed}`).innerHTML=`<button  onclick="delite(${speed})">
+                    🗑️
+                </button>`;
+
+            audioElement.appendChild(audio);
+
+        }
+
+
+
+        function edit(speed) {
+            window.location.href = `recording.html?speed=${speed}`;
+
+        }
+
+
+
+
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 30px;
+        }
+
+        button {
+            font-size: 18px;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+        }
+
+        #timer {
+            font-size: 40px;
+            margin: 20px;
+        }
+
+        .record {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+        }
+
+        .img{
+            width: 200px;
+            height: 200px;
+        }
+
+        .home {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <!DOCTYPE html>
+    <html lang="ru">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Звуко запись</title>
+    </head>
+
+    <body>
+
+        <h1>Звуко запись</h1>
+        <button class="home" onclick="window.location.href='index.html'">🏠</button>
+        <img id="speedimg">
+
+        <div id="timer">00:00</div>
+
+        <button id="start">🔴 Начать запись</button>
+
+
+        <div id="records"></div>
+        <div id="buttons"></div>
+
+        <script>
+            let recorder;
+            let chunks = [];
+            let startTime;
+            let timerInterval;
+            let is_started = false;
+            let speed;
+
+            const startBtn = document.getElementById("start");
+            const stopBtn = document.getElementById("stop");
+            const timer = document.getElementById("timer");
+            const records = document.getElementById("records");
+
+
+            const dbRequest = indexedDB.open("VoiceRecorder", 1);
+
+
+            let db;
+
+
+            dbRequest.onupgradeneeded = function (event) {
+                db = event.target.result;
+
+                db.createObjectStore("audio", {
+                    keyPath: "id",
+                    autoIncrement: true
+                });
+            };
+
+
+            dbRequest.onsuccess = function (event) {
+                db = event.target.result;
+
+            };
+
+
+
+            startBtn.onclick = async function () {
+                if (!is_started) {
+                    let stream = await navigator.mediaDevices.getUserMedia({
+                        audio: true
+                    });
+
+
+                    recorder = new MediaRecorder(stream);
+
+                    chunks = [];
+
+
+                    recorder.ondataavailable = e => {
+                        chunks.push(e.data);
+                    };
+
+
+                    recorder.onstop = showAudio;
+
+
+
+                    recorder.start();
+
+
+                    //startBtn.disabled = true;
+                    // stopBtn.disabled = false;
+
+
+                    startTime = Date.now();
+
+                    timerInterval = setInterval(() => {
+
+                        let sec = Math.floor(
+                            (Date.now() - startTime) / 1000
+                        );
+
+                        let min = Math.floor(sec / 60);
+
+                        sec = sec % 60;
+
+                        timer.textContent =
+                            String(min).padStart(2, "0")
+                            + ":"
+                            +
+                            String(sec).padStart(2, "0");
+
+                    }, 1000);
+                    startBtn.textContent = "⏹ Остановить";
+                    is_started = true;
+                }
+                else {
+                    recorder.stop();
+
+                    clearInterval(timerInterval);
+
+                    timer.textContent = "00:00";
+
+                    startBtn.remove();
+                    //showAudio();
+
+
+                    //startBtn.textContent="⏹ Остановить";
+                    timer.textContent = "";
+                    is_started = false;
+                }
+            };
+
+
+
+
+            function saveAudio() {
+
+                let blob = new Blob(chunks, {
+                    type: "audio/webm"
+                });
+
+                let transaction = db.transaction(["audio"], "readwrite");
+
+                let store = transaction.objectStore("audio");
+
+                let item = {
+                    speed: speed,
+                    date: new Date().toLocaleString(),
+                    audio: blob
+                };
+                store.put(item);
+                    window.location.href = `recording_studio.html`;
+                
+                // window.location.href = `recording_studio.html`;
+
+
+
+            }
+
+            function recordNew() {
+                location.reload();
+            }
+
+
+
+            function showAudio() {
+                let blob = new Blob(chunks, {
+                    type: "audio/webm"
+                });
+                let url = URL.createObjectURL(blob);
+                let audio = document.createElement("audio");
+
+                audio.controls = true;
+                audio.src = url;
+
+                document.body.appendChild(audio);
+                showEditButtons();
+            }
+
+            function showEditButtons() {
+                const buttinDiv = document.getElementById("buttons");
+                let saveButton = document.createElement("button");
+                let removeButton = document.createElement("button");
+
+                saveButton.textContent = "✅";
+                saveButton.addEventListener("click", () => saveAudio());
+
+                removeButton.textContent = "🗑️";
+                removeButton.addEventListener("click", () => recordNew());
+
+                document.body.appendChild(saveButton);
+                document.body.appendChild(removeButton);
+            }
+
+            const params = new URLSearchParams(window.location.search);
+
+            speed = parseInt(params.get("speed"));
+
+            console.log(speed);
+            const img = document.getElementById("speedimg");
+            img.src = `img_velosity/${speed}.png`;
+
+
+
+        </script>
+
+    </body>
+
+    </html>
+</body>
+
+</html>

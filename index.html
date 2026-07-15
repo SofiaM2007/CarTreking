@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>home</title>
+</head>
+<body>
+
+    <button onclick="window.location.href='recording_studio.html'">🎤 Звуко запись</button>
+    <button onclick="window.location.href='myWay.html'"> Мой путь</button>
+    
+    <script>
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                console.log('Microphone access granted');
+            })
+            .catch(error => {
+                console.error('Microphone access denied:', error);
+            });
+    </script>
+</body>
+</html>
