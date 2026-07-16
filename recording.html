@@ -32,8 +32,8 @@
         }
 
         .img{
-            width: 200px;
-            height: 200px;
+            width: 50%;
+            height: 50%;
         }
 
         .home {
@@ -179,9 +179,7 @@
 
             function saveAudio() {
 
-                let blob = new Blob(chunks, {
-                    type: "audio/webm"
-                });
+                let blob = new Blob(chunks);
 
                 let transaction = db.transaction(["audio"], "readwrite");
 
@@ -208,9 +206,7 @@
 
 
             function showAudio() {
-                let blob = new Blob(chunks, {
-                    type: "audio/webm"
-                });
+                let blob = new Blob(chunks);
                 let url = URL.createObjectURL(blob);
                 let audio = document.createElement("audio");
 

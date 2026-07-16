@@ -144,7 +144,7 @@
         }
 
         function delite(speed){
-            let transaction = db.transaction(["audio"], "readonly");
+            let transaction = db.transaction(["audio"], "readwrite");
 
             let store = transaction.objectStore("audio");
 
@@ -152,11 +152,13 @@
 
                 let cursor = event.target.result;
 
-                if (cursor) {
+                if (cursor.value.speed == speed) {
                     cursor.delete(); 
-                    loadAudio();
+                    location.reload();
+                    return;
                     
                 }
+                cursor.continue();
 
             };
         }
