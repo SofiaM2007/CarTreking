@@ -31,7 +31,7 @@
             border-radius: 10px;
         }
 
-        .img{
+        .img {
             width: 50%;
             height: 50%;
         }
@@ -42,7 +42,6 @@
             right: 20px;
             font-size: 24px;
         }
-
     </style>
 </head>
 
@@ -123,6 +122,15 @@
                         chunks.push(e.data);
                     };
 
+                    // Внутри startBtn.onclick:
+                    let options = {};
+                    let mimeType = getSupportedMimeType();
+                    if (mimeType) {
+                        options.mimeType = mimeType;
+                    }
+
+                    recorder = new MediaRecorder(stream, options);
+
 
                     recorder.onstop = showAudio;
 
@@ -191,8 +199,8 @@
                     audio: blob
                 };
                 store.put(item);
-                    window.location.href = `recording_studio.html`;
-                
+                window.location.href = `recording_studio.html`;
+
                 // window.location.href = `recording_studio.html`;
 
 
@@ -203,9 +211,26 @@
                 location.reload();
             }
 
+            // Функция для подбора поддерживаемого формата
+            function getSupportedMimeType() {
+                const types = [
+                    'audio/mp4',
+                    'audio/aac',
+                    'audio/webm;codecs=opus',
+                    'audio/webm'
+                ];
+                for (let type of types) {
+                    if (MediaRecorder.isTypeSupported(type)) {
+                        return type;
+                    }
+                }
+                return '';
+            }
+
 
 
             function showAudio() {
+                let mimeType = getSupportedMimeType() || 'audio/mp4';
                 let blob = new Blob(chunks);
                 let url = URL.createObjectURL(blob);
                 let audio = document.createElement("audio");
