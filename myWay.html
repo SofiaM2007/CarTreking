@@ -14,8 +14,10 @@
         }
 
         .map {
+            position: relative;
             height: 60%;
             background: lightblue;
+            font-size: 12px;
         }
 
         #divider {
@@ -34,27 +36,73 @@
             width: 100%;
             height: 100%;
         }
+
+        #info {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+
+            z-index: 1000;
+
+            background: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+        }
+
+        
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="speedometer.js"></script>
 </head>
 
-<body style="margin: 0; padding: 0;">
+<body onload='draw(0)' style="margin: 0; padding: 0;" >
     <div class="map">
         <div id="map"></div>
+        <div id="info">
+            <div width="100%" style="display: flex; justify-content: space-between; align-items: center;">
+                <div width="60%">
+                    <p>Широта: <span id="latitude"></span></p>
+                    <p>Долгота: <span id="longitude"></span></p>
+                </div>
+                <div width="40%">
+                    <img id="drive-on-side-image" src="" alt="Drive on side" style="width: 70px; height: 50px;">
+                </div>
+            </div>
+            <p>Название дороги: <span id="road-name-info"></span></p>
+
+            <p>Класс дороги: <span id="road-class-info"></span></p>
+        </div>
     </div>
 
     <div id="divider"></div>
 
     <div class="driveInfo">
-        <h1>!!!</h1>
+        
+        <canvas id="tutorial" width="330" height="300"></canvas>
+
     </div>
 
 </body>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
+    /*
+    <p>Скорость: <span id="velocity-info"></span></p>
+        <p>Максимальная разрешенная скорость: <span id="max-velocity-info"></span></p>
+    */
+
+    let forLastPosition = [];
+
+
     const divider = document.getElementById("divider");
     const map = document.querySelector(".map");
     const info = document.querySelector(".driveInfo");
+
+
+    let latitude, longitude, velocity, direction;
+    let maxspeed;
 
     let dragging = false;
 
@@ -71,11 +119,11 @@
         if (!dragging) return;
 
         let y = e.clientY;
-        if (y< window.innerHeight * 0.3) y = window.innerHeight * 0.3;
-        if (y> window.innerHeight * 0.7) y = window.innerHeight * 0.7;
+        if (y < window.innerHeight * 0.3) y = window.innerHeight * 0.3;
+        if (y > window.innerHeight * 0.7) y = window.innerHeight * 0.7;
 
         map.style.height = y + "px";
-        
+
 
         info.style.height =
             (window.innerHeight - y - divider.offsetHeight) + "px";
@@ -113,6 +161,50 @@
         mapmy.setView([lat, lon]);
 
     });
+
+    function getLokationInfo() {
+        navigator.geolocation.watchPosition(
+            (position) => {
+                latitude = position.coords.latitude;
+                longitude = position.coords.longitude;
+
+                velocity = position.coords.speed;
+                draw(velocity, maxspeed);
+
+                direction = position.coords.heading;
+                console.log(`Latitude: ${latitude}, Longitude: ${longitude}, Velocity: ${velocity}, Direction: ${direction}`);
+                document.getElementById("latitude").textContent = latitude.toFixed(4);
+                document.getElementById("longitude").textContent = longitude.toFixed(4);
+
+
+
+                console.log(forLastPosition.length);
+
+                if (forLastPosition.length < 4) {
+                    forLastPosition.push({ latitude, longitude });
+                    if (forLastPosition.length === 4) {
+                        console.log("4 positions collected, starting action...");
+                        startAction();
+                    }
+                }
+                else {
+
+                    forLastPosition.shift();
+                    forLastPosition.push({ latitude, longitude });
+
+                }
+
+            },
+            (error) => {
+                console.log(error);
+            },
+            {
+                enableHighAccuracy: true
+            }
+        );
+
+    }
+
     let marker = L.marker([0, 0]).addTo(mapmy);
 
     navigator.geolocation.watchPosition((pos) => {
@@ -123,6 +215,185 @@
         marker.setLatLng([lat, lon]);
 
     });
+
+    async function getMaxVelocity() {
+        let request = {
+            shape: [
+                { lat: forLastPosition[0].latitude, lon: forLastPosition[0].longitude },
+                { lat: forLastPosition[1].latitude, lon: forLastPosition[1].longitude },
+                { lat: forLastPosition[2].latitude, lon: forLastPosition[2].longitude },
+                { lat: forLastPosition[3].latitude, lon: forLastPosition[3].longitude },
+            ],
+            costing: "auto",
+            shape_match: "map_snap",
+            format: "osrm"
+        };
+
+        console.log("!!!!");
+
+        /* fetch("https://overpass-api.de/api/interpreter", {
+             method: "POST",
+             body: query
+         })*/
+        fetch(
+            "https://valhalla1.openstreetmap.de/trace_attributes",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(request)
+            }
+        )
+            .then(response => response.json())
+            .then(data => {
+
+                console.log(data);
+                setroadDats(data);
+
+
+
+            });
+
+        /*  .then(r => r.json())
+          .then(async response => {
+
+              let text = await response.text();
+
+              console.log(text);
+
+          })
+          .then(data => {
+              if (data.elements.length > 0) {
+
+                  let road = data.elements[0];
+
+                  if (road.tags.maxspeed) {
+                      console.log("Ограничение:", tags.maxspeed);
+                  }
+                  else {
+                      console.log("Ограничение не указано в OSM");
+                  }
+
+                  console.log("Название:", road.tags.name);
+                  console.log("Ограничение:", road.tags.maxspeed);
+                  maxspeed = road.tags.maxspeed;
+
+                  document.getElementById("max-velocity-info").textContent = road.tags.maxspeed;
+              }
+          });
+          
+*/
+
+    }
+
+
+    function setroadDats(data) {
+
+        if (data.edges.length > 0) {
+
+            let road = data.edges[0];
+
+
+            if (road.speed_limit) {
+                //document.getElementById("max-velocity-info").textContent = data.edges[0].speed_limit;
+                maxspeed = road.speed_limit;
+            }
+            else {
+              //  document.getElementById("max-velocity-info").textContent = "не указано";
+                maxspeed = 200;
+                
+            }
+
+            document.getElementById("road-name-info").textContent = data.edges[0].names[0];
+            maxspeed = road.speed_limit;
+            draw(velocity, maxspeed); /////////////////////////
+
+            switch (road.drive_on_right) {
+                case true:
+                    document.getElementById("drive-on-side-image").src = `img_velosity/driveOnTheRight.png`;
+                    break;
+                case false:
+                    document.getElementById("drive-on-side-image").src = `img_velosity/driveOnTheLeft.png`;
+                    break;
+                default:
+
+                //document.getElementById("drive-on-side-image").src = "unknown.png";
+            }
+
+
+            switch (road.road_class) {
+                case "motorway":
+                    document.getElementById("road-class-info").textContent = "Автомагистраль";
+                    break;
+                case "trunk":
+                    document.getElementById("road-class-info").textContent = "Автобан";
+                    break;
+                case "primary":
+                    document.getElementById("road-class-info").textContent = "Главная дорога";
+                    break;
+                case "secondary":
+                    document.getElementById("road-class-info").textContent = "Второстепенная дорога";
+                    break;
+                case "tertiary":
+                    document.getElementById("road-class-info").textContent = "Третичная дорога";
+                    break;
+                case "unclassified":
+                    document.getElementById("road-class-info").textContent = "Обычная дорога местного значения";
+                    break;
+                case "residential":
+                    document.getElementById("road-class-info").textContent = "Жилая улица";
+                    break;
+                case "living_street":
+                    document.getElementById("road-class-info").textContent = "Жилая зона";
+                    break;
+                case "service":
+                    document.getElementById("road-class-info").textContent = "Служебная/подъездная дорога";
+                    break;
+                case "motorway_link":
+                    document.getElementById("road-class-info").textContent = "Съезд/заезд на автомагистраль";
+                    break;
+                case "trunk_link":
+                    document.getElementById("road-class-info").textContent = "Съезд/заезд на автобан";
+                    break;
+                case "primary_link":
+                    document.getElementById("road-class-info").textContent = "Съезд/заезд на главную дорогу";
+                    break;
+                case "secondary_link":
+                    document.getElementById("road-class-info").textContent = "Съезд/заезд на второстепенную дорогу";
+                    break;
+                case "tertiary_link":
+                    document.getElementById("road-class-info").textContent = "Съезд/заезд на третичную дорогу";
+                    break;
+                default:
+                    document.getElementById("road-class-info").textContent = "не указано";
+            }
+
+
+
+        }
+    }
+
+
+
+    // const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    async function startAction() {
+        setTimeout(() => {
+            getMaxVelocity();
+
+        }, 10000);
+    }
+
+
+
+
+    setTimeout(() => {
+        getLokationInfo();
+
+    }, 2000);
 
 
 </script>
