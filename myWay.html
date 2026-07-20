@@ -30,6 +30,8 @@
         .driveInfo {
             height: calc(40% - 10px);
             background: whitesmoke;
+            display: flex;
+            justify-content: center;
         }
 
         #map {
@@ -82,6 +84,7 @@
     <div class="driveInfo">
         
         <canvas id="tutorial" width="440" height="400"></canvas>
+        <button style="border: none; outline: none; background: none;  position: flex; width: 50px; height: 50px;" onclick="editAudio()"><img src="img_velosity/audioOff.png" alt="Edit Audio" id="audio-button" style="width: 130%; height: 100%;"></button>
 
     </div>
 
@@ -94,6 +97,7 @@
     */
 
     let forLastPosition = [];
+    let isAudioOn = false;
 
 
     const divider = document.getElementById("divider");
@@ -373,6 +377,17 @@
 
 
 
+        }
+    }
+
+    function editAudio() {
+        if (!isAudioOn) {
+            isAudioOn = true;
+            document.getElementById("audio-button").src = "img_velosity/audioOn.png";
+        }
+        else {
+            isAudioOn = false;
+            document.getElementById("audio-button").src = "img_velosity/audioOff.png";
         }
     }
 
