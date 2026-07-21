@@ -14,7 +14,7 @@ function draw(speed, allowedSpeed1) {
     if (currentSpeed > maxSpeed) { currentSpeed = maxSpeed; }
 
     allowedSpeed = parseFloat(allowedSpeed1);
-    console.log(allowedSpeed1);
+
     if (isNaN(allowedSpeed)) { allowedSpeed = 0; }
     if (allowedSpeed < 0) { allowedSpeed = 0; }
     if (allowedSpeed > maxSpeed) { allowedSpeed = maxSpeed; }
@@ -57,6 +57,7 @@ function drawSpeedometer() {
     ctx.stroke();
 
     // Шкала
+    //console.error("drawScale");
     drawScale(
         centerX,
         centerY,
@@ -64,6 +65,8 @@ function drawSpeedometer() {
         startAngle,
         endAngle
     );
+
+   // сonsole.error("drawNeedle");
 
     // Стрелка
     drawNeedle(
@@ -73,6 +76,8 @@ function drawSpeedometer() {
         startAngle,
         endAngle
     );
+
+    //console.error("drawSpeedometerFill");
 
     // Значение скорости
     ctx.font = "20px Arial";
@@ -156,58 +161,69 @@ function drawScale(
     startAngle,
     endAngle
 ) {
-    for (var i = 0; i <= maxSpeed; i += 10) {
+    //alert("ЭТА ФУНКЦИЯ ЗАПУСТИЛАСЬ");
+    for (var i = 0; i <= maxSpeed; i += 1) {
+
         var angle =
             startAngle +
             (i / maxSpeed) *
             (endAngle - startAngle);
 
-        var outerX =
+
+        let outerRadius = radius - 10;
+        let innerRadius;
+
+        if (i % 10 === 0) {
+            innerRadius = radius - 30;
+        } else {
+            innerRadius = radius - 20;
+        }
+
+
+        let outerX =
             centerX +
-            Math.cos(angle) *
-            (radius - 10);
+            Math.cos(angle) * outerRadius;
 
-        var outerY =
+        let outerY =
             centerY +
-            Math.sin(angle) *
-            (radius - 10);
+            Math.sin(angle) * outerRadius;
 
-        var innerX =
+        let innerX =
             centerX +
-            Math.cos(angle) *
-            (radius - 30);
+            Math.cos(angle) * innerRadius;
 
-        var innerY =
+        let innerY =
             centerY +
-            Math.sin(angle) *
-            (radius - 30);
+            Math.sin(angle) * innerRadius;
 
         // Отметка
         ctx.beginPath();
         ctx.moveTo(innerX, innerY);
         ctx.lineTo(outerX, outerY);
 
-        ctx.lineWidth = 3;
+        ctx.lineWidth = i % 10 === 0 ? 3 : 2;
         ctx.strokeStyle = "white";
         ctx.stroke();
 
-        // Число
-        var textX =
-            centerX +
-            Math.cos(angle) *
-            (radius - 55);
+        if (i % 10 === 0) {
+            // Число
+            var textX =
+                centerX +
+                Math.cos(angle) *
+                (radius - 55);
 
-        var textY =
-            centerY +
-            Math.sin(angle) *
-            (radius - 55);
+            var textY =
+                centerY +
+                Math.sin(angle) *
+                (radius - 55);
 
-        ctx.font = "14px Arial";
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
+            ctx.font = "14px Arial";
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
 
-        ctx.fillText(i, textX, textY);
+            ctx.fillText(i, textX, textY);
+        }
     }
 }
 
