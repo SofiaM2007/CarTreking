@@ -34,6 +34,9 @@
             top: 20px;
             right: 20px;
             font-size: 24px;
+            border: none;
+            background: none;
+            
         }
 
     </style>
@@ -42,7 +45,7 @@
 
 <body>
     <div>
-    <h2>🎤 Записи для каждой скорости</h2>
+    <h2>Записи для каждой скорости</h2>
     <button class="home" onclick="window.location.href='index.html'">🏠</button>
 </div>
     <table>
@@ -74,7 +77,7 @@
             let row = document.createElement("tr");
             row.innerHTML = `
             <td>
-                ${speed} км/ч
+               <img style="width: 50px; height: 50px;" src="img_velosity/${speed}.png" alt="${speed} км/ч">
             </td>
             <td id = "audio${speed}">
                 🎤 Нет записи
@@ -82,7 +85,7 @@
 
             <td>
                 <button onclick="edit(${speed})">
-                    🖉
+                    ✏️
                 </button>
             </td>
 

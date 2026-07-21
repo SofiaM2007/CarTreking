@@ -30,7 +30,7 @@
         .driveInfo {
             height: calc(40% - 10px);
             background: whitesmoke;
-             position: relative;
+            position: relative;
             display: flex;
             justify-content: center;
         }
@@ -62,19 +62,21 @@
 <body onload='draw(0)' style="margin: 0; padding: 0;">
     <div class="map">
         <div id="map"></div>
+        <button onclick="window.location.href='index.html'"
+            style="border: none; outline: none; background: none; width: 50px; height: 50px; position: absolute; top: 10px; right: 10px; z-index: 1000;">🏠</button>
         <div id="info">
             <div width="100%" style="display: flex; justify-content: space-between; align-items: center;">
                 <div width="60%">
                     <p>Широта: <span id="latitude"></span></p>
                     <p>Долгота: <span id="longitude"></span></p>
                 </div>
-                <div width="40%" id ="drive-on-side" style ="visibility: hidden">
+                <div width="40%" id="drive-on-side" style="visibility: hidden">
                     <img id="drive-on-side-image" src="" alt="Drive on side" style="width: 70px; height: 50px;">
                 </div>
             </div>
-            <p id="road-name" style ="visibility: hidden">Название дороги: <span id="road-name-info"></span></p>
+            <p id="road-name" style="visibility: hidden">Название дороги: <span id="road-name-info"></span></p>
 
-            <p id = "road-class" style ="visibility: hidden">Класс дороги: <span id="road-class-info"></span></p>
+            <p id="road-class" style="visibility: hidden">Класс дороги: <span id="road-class-info"></span></p>
         </div>
     </div>
 
@@ -83,7 +85,8 @@
     <div class="driveInfo">
 
         <canvas id="tutorial" width="440%" height="400%"></canvas>
-        <button style="border: none; outline: none; background: none; z-index: 10; position: absolute; width: 50px; height: 50px;top: 20px; right: 20px;"
+        <button
+            style="border: none; outline: none; background: none; z-index: 10; position: absolute; width: 50px; height: 50px;top: 20px; right: 20px;"
             onclick="editAudio()"><img src="img_velosity/audioOff.png" alt="Edit Audio" id="audio-button"
                 style="width: 130%; height: 100%;"></button>
 
@@ -107,7 +110,7 @@
 
 
     let latitude, longitude, velocity, direction;
-    let maxspeed;
+    let maxspeed = 0;
 
     let dragging = false;
 
@@ -247,6 +250,9 @@
         velocity = velocity * 3.6; // km/h
         console.log(`v=${velocity}`);
         draw(velocity, maxspeed);
+        if (maxspeed != 0 && maxspeed && velocity > maxspeed) {
+            sayAboutError();
+        }
     }
 
     function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
@@ -381,9 +387,13 @@
 
 
 
-
             maxspeed = road.speed_limit;
             draw(velocity, maxspeed); /////////////////////////
+
+
+            if (maxspeed != 0 && maxspeed && velocity > maxspeed) {
+                sayAboutError();
+            }
 
             document.getElementById("drive-on-side").style.visibility = "visible";
             switch (road.drive_on_right) {
@@ -394,11 +404,11 @@
                     document.getElementById("drive-on-side-image").src = `img_velosity/driveOnTheLeft.png`;
                     break;
                 default:
-
+                    document.getElementById("drive-on-side").style.visibility = "hidden";
                 //document.getElementById("drive-on-side-image").src = "unknown.png";
             }
 
-            
+
             document.getElementById("road-class").style.visibility = "visible";
             switch (road.road_class) {
                 case "motorway":
@@ -460,6 +470,74 @@
         else {
             isAudioOn = false;
             document.getElementById("audio-button").src = "img_velosity/audioOff.png";
+        }
+    }
+
+    let request = indexedDB.open("VoiceRecorder", 1);
+    let db;
+
+    request.onupgradeneeded = function (event) {
+        db = event.target.result;
+
+        db.createObjectStore("audio", {
+            keyPath: "id",
+            autoIncrement: true
+        });
+    };
+
+    request.onsuccess = function (event) {
+
+        db = event.target.result;
+        let transaction = db.transaction(["audio"], "readonly");
+
+        let store = transaction.objectStore("audio");
+
+        store.getAll().onsuccess = function (e) {
+            console.log(e.target.result);
+        };
+
+    };
+
+
+    function sayAboutError() {
+        if (isAudioOn) {
+            console.log("play audio");
+            let transaction = db.transaction(["audio"], "readonly");
+            let store = transaction.objectStore("audio");
+
+            store.openCursor().onsuccess = function (event) {
+                let cursor = event.target.result;
+
+                if (cursor) {
+                    if (cursor.value.speed === maxspeed) {
+                        let audio = new Audio(
+                            URL.createObjectURL(cursor.value.audio)
+                        );
+
+                        let lastMaxspeed = maxspeed;
+
+
+                        audio.play();
+                        audio.onended = function () {
+
+                            if (maxspeed && lastMaxspeed == maxspeed && velocity > maxspeed) {
+
+
+                                setTimeout(function () {
+
+                                    audio.currentTime = 0;
+                                    audio.play();
+
+                                }, 2000);
+                            }
+
+                        };
+                        return;
+                    }
+
+                    cursor.continue();
+                }
+            };
         }
     }
 

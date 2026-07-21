@@ -41,6 +41,8 @@
             top: 20px;
             right: 20px;
             font-size: 24px;
+            border: none;
+            background: none;
         }
     </style>
 </head>
@@ -123,13 +125,13 @@
                     };
 
                     // Внутри startBtn.onclick:
-                    let options = {};
+                   /* let options = {};
                     let mimeType = getSupportedMimeType();
                     if (mimeType) {
                         options.mimeType = mimeType;
                     }
 
-                    recorder = new MediaRecorder(stream, options);
+                    recorder = new MediaRecorder(stream, options);*/
 
 
                     recorder.onstop = showAudio;
@@ -230,7 +232,7 @@
 
 
             function showAudio() {
-                let mimeType = getSupportedMimeType() || 'audio/mp4';
+                let mimeType ='audio/mp4';
                 let blob = new Blob(chunks);
                 let url = URL.createObjectURL(blob);
                 let audio = document.createElement("audio");
