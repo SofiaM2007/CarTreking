@@ -1,25 +1,405 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>home</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Drive App</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            font-family: Arial, sans-serif;
+
+            color: white;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #303030,
+                    #090909 70%
+                );
+
+        }
+
+
+        .container {
+
+            width: 90%;
+
+            max-width: 500px;
+
+            text-align: center;
+
+        }
+
+
+        h1 {
+
+            margin: 0;
+
+            font-size: 42px;
+
+            letter-spacing: 5px;
+
+        }
+
+
+        .subtitle {
+
+            color: #888;
+
+            margin-top: 10px;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        /* Большая карточка */
+
+        .dashboard {
+
+            position: relative;
+
+            width: 100%;
+
+            height: 260px;
+
+            overflow: hidden;
+
+            border-radius: 30px;
+
+            background:
+
+                linear-gradient(
+                    rgba(0,0,0,0.2),
+                    rgba(0,0,0,0.7)
+                ),
+
+                url("img_velosity/speedometer.jpg");
+
+            background-size: cover;
+
+            background-position: center;
+
+            box-shadow:
+
+                0 15px 40px
+                rgba(0,0,0,0.6);
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .dashboard::after {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            background:
+                linear-gradient(
+                    transparent,
+                    rgba(0,0,0,0.8)
+                );
+
+        }
+
+
+        .dashboard-text {
+
+            position: absolute;
+
+            z-index: 2;
+
+            bottom: 25px;
+
+            left: 25px;
+
+            text-align: left;
+
+        }
+
+
+        .dashboard-text h2 {
+
+            margin: 0;
+
+            font-size: 28px;
+
+        }
+
+
+        .dashboard-text p {
+
+            margin-top: 5px;
+
+            color: #bbb;
+
+        }
+
+
+        /* Кнопки */
+
+        .buttons {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 15px;
+
+        }
+
+
+        .menu-button {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 18px;
+
+            width: 100%;
+
+            padding: 18px 22px;
+
+            border: 1px solid #333;
+
+            border-radius: 18px;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #252525,
+                    #111
+                );
+
+            color: white;
+
+            cursor: pointer;
+
+            text-align: left;
+
+            transition: 0.25s;
+
+        }
+
+
+        .menu-button:hover {
+
+            transform: translateY(-3px);
+
+            border-color: #00ff88;
+
+            box-shadow:
+
+                0 0 20px
+                rgba(0,255,136,0.2);
+
+        }
+
+
+        .menu-button:active {
+
+            transform: scale(0.97);
+
+        }
+
+
+        .icon {
+
+            width: 55px;
+
+            height: 55px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 15px;
+
+            background: #333;
+
+            font-size: 30px;
+
+        }
+
+
+        .button-text {
+
+            flex: 1;
+
+        }
+
+
+        .button-title {
+
+            font-size: 19px;
+
+            font-weight: bold;
+
+        }
+
+
+        .button-description {
+
+            margin-top: 4px;
+
+            color: #888;
+
+            font-size: 13px;
+
+        }
+
+
+        .arrow {
+
+            font-size: 25px;
+
+            color: #777;
+
+        }
+
+
+        footer {
+
+            margin-top: 30px;
+
+            color: #444;
+
+            font-size: 12px;
+
+        }
+
+    </style>
+
 </head>
+
+
 <body>
 
-    <button onclick="window.location.href='recording_studio.html'">🎤 Звуко запись</button>
-    <button onclick="window.location.href='myWay.html'"> Мой путь</button>
-    
-    <script>
-       /* navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-                console.log('Microphone access granted');
-            })
-            .catch(error => {
-                console.error('Microphone access denied:', error);
-            });*/
 
-            //python -m http.server 8000 --bind 0.0.0.0
-    </script>
+    <div class="container">
+
+
+        <h1>DRIVE</h1>
+
+
+
+
+        <div class="buttons">
+
+
+            <button
+                class="menu-button"
+                onclick="
+                    window.location.href=
+                    'recording_studio.html'
+                "
+            >
+
+                <div class="icon">
+                    🎤
+                </div>
+
+
+                <div class="button-text">
+
+                    <div class="button-title">
+                        Звукозапись
+                    </div>
+
+
+                    <div class="button-description">
+                        Записать звук с микрофона джля оповещений оп ревышении скорости
+                    </div>
+
+                </div>
+
+
+                <div class="arrow">
+                    →
+                </div>
+
+            </button>
+
+
+            <button
+                class="menu-button"
+                onclick="
+                    window.location.href=
+                    'myWay.html'
+                "
+            >
+
+                <div class="icon">
+                    🗺️
+                </div>
+
+
+                <div class="button-text">
+
+                    <div class="button-title">
+                        Мой путь
+                    </div>
+
+
+                    <div class="button-description">
+                        GPS, карта и отображение скорости в реальном времени
+                    </div>
+
+                </div>
+
+
+                <div class="arrow">
+                    →
+                </div>
+
+            </button>
+
+
+        </div>
+
+
+
+    </div>
+
+
 </body>
+
+<script>
+    //python -m http.server 8000 --bind 0.0.0.0
+</script>
+
 </html>

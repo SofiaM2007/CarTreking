@@ -123,7 +123,7 @@ function drawSpeedometerFill(
 
     ctx.closePath();
 
-    ctx.fillStyle = "#00aa00";
+    ctx.fillStyle = "#006700";
     ctx.fill();
 
     /*fillAngle =
@@ -148,7 +148,7 @@ function drawSpeedometerFill(
 
     ctx.closePath();
 
-    ctx.fillStyle = "#aa0000";
+    ctx.fillStyle = "#5c0000";
     ctx.fill();
 
 }

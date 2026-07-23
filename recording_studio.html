@@ -176,6 +176,7 @@
             let audio = document.createElement("audio");
 
             audio.controls = true;
+            audio.style.width = "200px";
             audio.src = url;
 
             document.getElementById(`delite${speed}`).innerHTML=`<button  onclick="delite(${speed})">
