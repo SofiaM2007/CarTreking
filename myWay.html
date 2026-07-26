@@ -697,6 +697,13 @@
 
                                 // Запускаем! Это сработает в любой момент, даже асинхронно
                                 source.start(0);
+                                source.onsuccess = function () {
+                                    if (maxspeed && lastMaxspeed == maxspeed && velocity > maxspeed) {
+                                        setTimeout(function () {
+                                            source.start(0);
+                                        }, 2000);
+                                    }
+                                };
                                 console.log("Звук ошибки успешно сыграл через Web Audio API!");
                             }, function (err) {
                                 console.error("Ошибка декодирования аудио (возможно формат не поддерживается iOS):", err);
