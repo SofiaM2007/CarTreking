@@ -526,15 +526,16 @@
 
 
             maxspeed = road.speed_limit;
-            maxspeed=30;
-            velocity = maxspeed + 1;
-            
+           // maxspeed=30;
+           // velocity = maxspeed + 1;
+
             draw(velocity, maxspeed); /////////////////////////
 
             
 
 
             if (maxspeed != 0 && maxspeed && velocity > maxspeed) {
+                 alert("play audio");
                 sayAboutError();
             }
 
@@ -644,7 +645,7 @@
 
     function sayAboutError() {
         if (isAudioOn) {
-            console.log("play audio");
+            alert("play audio");
             let transaction = db.transaction(["audio"], "readonly");
             let store = transaction.objectStore("audio");
 
@@ -688,25 +689,25 @@
 
     // const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    async function startAction() {
+   /* async function startAction() {
         setTimeout(() => {
             getMaxVelocity();
 
         }, 10000);
     }
 
-    /*async function getKoordinatsAndVilosity() {
-        setTimeout(() => {
-            getMyVelosity();
-
-        }, 2000);
-    }*/
-
-
     setTimeout(() => {
         getLokationInfo();
 
-    }, 2000);
+    }, 2000);*/
+
+
+    setTimeout(() => {
+        velocity = 31;
+        maxspeed = 30;
+        sayAboutError();
+
+    }, 5000);
 
 
 </script>
