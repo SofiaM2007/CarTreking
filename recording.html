@@ -233,8 +233,8 @@
 
 
             function showAudio() {
-                let mimeType ='audio/mp4';
-                let blob = new Blob(chunks);
+                let mimeType ='audio/mp4;codecs=mp4a.40.2';
+                let blob = new Blob(chunks, { type: mimeType });
                 let url = URL.createObjectURL(blob);
                 let audio = document.createElement("audio");
 
