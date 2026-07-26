@@ -607,14 +607,18 @@
     }
 
     function editAudio() {
-        if (!isAudioOn) {
+        /*if (!isAudioOn) {
             isAudioOn = true;
             document.getElementById("audio-button").src = "img_velosity/audioOn.png";
         }
         else {
             isAudioOn = false;
             document.getElementById("audio-button").src = "img_velosity/audioOff.png";
-        }
+        }*/
+       velocity = 100;
+       maxspeed = 30;
+
+       sayAboutError();
     }
 
     let request = indexedDB.open("VoiceRecorder", 1);
@@ -645,7 +649,7 @@
 
     function sayAboutError() {
         if (isAudioOn) {
-            alert("play audio");
+            //alert("play audio");
             let transaction = db.transaction(["audio"], "readonly");
             let store = transaction.objectStore("audio");
 
@@ -702,12 +706,6 @@
     }, 2000);*/
 
 
-    setTimeout(() => {
-        velocity = 31;
-        maxspeed = 30;
-        sayAboutError();
-
-    }, 5000);
 
 
 </script>
