@@ -609,8 +609,8 @@
 
     let audio=null;
     function editAudio() {
-        globalAudio = new Audio();
-        globalAudio.play().catch(() => {}); // Пустой запуск для разблокировки в Safari
+        audio = new Audio();
+        audio.play().catch(() => {}); // Пустой запуск для разблокировки в Safari
         alert("Звук в Safari разблокирован");
 
         if (!isAudioOn) {
