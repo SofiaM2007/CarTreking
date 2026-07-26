@@ -526,16 +526,16 @@
 
 
             maxspeed = road.speed_limit;
-            maxspeed=30;
+            maxspeed = 30;
             velocity = maxspeed + 1;
 
             draw(velocity, maxspeed); /////////////////////////
 
-            
+
 
 
             if (maxspeed != 0 && maxspeed && velocity > maxspeed) {
-                 alert("play audio");
+                //alert("play audio");
                 sayAboutError();
             }
 
@@ -607,11 +607,17 @@
     }
 
 
-    let audio=null;
+    let audioCtx = null;
     function editAudio() {
-        audio = new Audio();
-        audio.play().catch(() => {}); // Пустой запуск для разблокировки в Safari
-        alert("Звук в Safari разблокирован");
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+
+        // "Прогреваем" контекст пустой нотой, чтобы Safari его одобрил
+        let buffer = audioCtx.createBuffer(1, 1, 22050);
+        let node = audioCtx.createBufferSource();
+        node.buffer = buffer;
+        node.connect(audioCtx.destination);
+        node.start(0);
 
         if (!isAudioOn) {
             isAudioOn = true;
@@ -650,7 +656,7 @@
 
 
     function sayAboutError() {
-        if (isAudioOn && audio) {
+        if (isAudioOn && audioCtx) {
             //alert("play audio");
             let transaction = db.transaction(["audio"], "readonly");
             let store = transaction.objectStore("audio");
@@ -660,13 +666,13 @@
 
                 if (cursor) {
                     if (cursor.value.speed === maxspeed) {
-                        audio.src = URL.createObjectURL(cursor.value.audio)
-                        
+                        let audioBlob = cursor.value.audio;
+
 
                         let lastMaxspeed = maxspeed;
 
 
-                        audio.play();
+                        /*audio.play();
                         audio.onended = function () {
 
                             if (maxspeed && lastMaxspeed == maxspeed && velocity > maxspeed) {
@@ -680,7 +686,22 @@
                                 }, 2000);
                             }
 
-                        };
+                        };*/
+                        audioBlob.arrayBuffer().then(arrayBuffer => {
+                            // Декорируем аудиоданные в контексте
+                            audioCtx.decodeAudioData(arrayBuffer, function (audioBuffer) {
+                                // Создаем источник звука
+                                let source = audioCtx.createBufferSource();
+                                source.buffer = audioBuffer;
+                                source.connect(audioCtx.destination);
+
+                                // Запускаем! Это сработает в любой момент, даже асинхронно
+                                source.start(0);
+                                console.log("Звук ошибки успешно сыграл через Web Audio API!");
+                            }, function (err) {
+                                console.error("Ошибка декодирования аудио (возможно формат не поддерживается iOS):", err);
+                            });
+                        });
                         return;
                     }
 
