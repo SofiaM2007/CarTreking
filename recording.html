@@ -10,7 +10,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 30px;
-            
+
         }
 
         button {
@@ -126,13 +126,13 @@
                     };
 
                     // Внутри startBtn.onclick:
-                   /* let options = {};
-                    let mimeType = getSupportedMimeType();
-                    if (mimeType) {
-                        options.mimeType = mimeType;
-                    }
-
-                    recorder = new MediaRecorder(stream, options);*/
+                    /* let options = {};
+                     let mimeType = getSupportedMimeType();
+                     if (mimeType) {
+                         options.mimeType = mimeType;
+                     }
+ 
+                     recorder = new MediaRecorder(stream, options);*/
 
 
                     recorder.onstop = showAudio;
@@ -190,7 +190,8 @@
 
             function saveAudio() {
 
-                let blob = new Blob(chunks);
+                let mimeType = 'audio/mp4;codecs=mp4a.40.2';
+                let blob = new Blob(chunks, { type: mimeType });
 
                 let transaction = db.transaction(["audio"], "readwrite");
 
@@ -201,8 +202,11 @@
                     date: new Date().toLocaleString(),
                     audio: blob
                 };
-                store.put(item);
-                window.location.href = `recording_studio.html`;
+                let request = store.put(item);
+
+                request.onsuccess = function () {
+                    window.location.href = 'recording_studio.html';
+                };
 
                 // window.location.href = `recording_studio.html`;
 
@@ -233,7 +237,7 @@
 
 
             function showAudio() {
-                let mimeType ='audio/mp4;codecs=mp4a.40.2';
+                let mimeType = 'audio/mp4;codecs=mp4a.40.2';
                 let blob = new Blob(chunks, { type: mimeType });
                 let url = URL.createObjectURL(blob);
                 let audio = document.createElement("audio");
