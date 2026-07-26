@@ -695,15 +695,19 @@
                                 source.buffer = audioBuffer;
                                 source.connect(audioCtx.destination);
 
-                                // Запускаем! Это сработает в любой момент, даже асинхронно
-                                source.start(0);
-                                source.onsuccess = function () {
-                                    if (maxspeed && lastMaxspeed == maxspeed && velocity > maxspeed) {
+                                source.onended = function () {
+                                    // Проверяем ваши условия для повтора
+                                    if (maxspeed && lastMaxspeed === maxspeed && velocity > maxspeed) {
+
+                                        // Через 2 секунды запускаем функцию повторно (создастся новый source)
                                         setTimeout(function () {
-                                            source.start(0);
+                                            playSingleSound(audioBuffer);
                                         }, 2000);
+
                                     }
                                 };
+                                source.start(0);
+
                                 console.log("Звук ошибки успешно сыграл через Web Audio API!");
                             }, function (err) {
                                 console.error("Ошибка декодирования аудио (возможно формат не поддерживается iOS):", err);
