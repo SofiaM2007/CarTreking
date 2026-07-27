@@ -45,6 +45,27 @@
             border: none;
             background: none;
         }
+
+        .info {
+            display: flex;
+            flex-direction: column;
+            height: 50px;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 15px;
+
+        }
+
+        .records{
+            width:100%;
+        }
+
+
+
+
+
+
     </style>
 </head>
 
@@ -68,9 +89,10 @@
 
         <button id="start">🔴 Начать запись</button>
 
-
-        <div id="records"></div>
-        <div id="buttons"></div>
+        <div class="info">
+            <div id="records" class = "records" ></div>
+            <div id="buttons"></div>
+        </div>
 
         <script>
             let recorder;
@@ -218,22 +240,6 @@
                 location.reload();
             }
 
-            // Функция для подбора поддерживаемого формата
-            function getSupportedMimeType() {
-                const types = [
-                    'audio/mp4',
-                    'audio/aac',
-                    'audio/webm;codecs=opus',
-                    'audio/webm'
-                ];
-                for (let type of types) {
-                    if (MediaRecorder.isTypeSupported(type)) {
-                        return type;
-                    }
-                }
-                return '';
-            }
-
 
 
             function showAudio() {
@@ -241,6 +247,7 @@
                 let blob = new Blob(chunks, { type: mimeType });
                 let url = URL.createObjectURL(blob);
                 let audio = document.createElement("audio");
+                audio.classList.add("records"); 
 
                 audio.controls = true;
                 audio.src = url;

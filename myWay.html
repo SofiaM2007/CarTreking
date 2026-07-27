@@ -388,6 +388,11 @@
         velocity = velocity * 3.6; // km/h
         console.log(`v=${velocity}`);
         draw(velocity, maxspeed);
+
+
+        maxspeed = 30;
+        velocity = maxspeed + 1;
+        
         if (maxspeed != 0 && maxspeed && velocity > maxspeed) {
             sayAboutError();
         }
@@ -695,17 +700,6 @@
                                 source.buffer = audioBuffer;
                                 source.connect(audioCtx.destination);
 
-                                source.onended = function () {
-                                    // Проверяем ваши условия для повтора
-                                    if (maxspeed && lastMaxspeed === maxspeed && velocity > maxspeed) {
-
-                                        // Через 2 секунды запускаем функцию повторно (создастся новый source)
-                                        setTimeout(function () {
-                                            playSingleSound(audioBuffer);
-                                        }, 2000);
-
-                                    }
-                                };
                                 source.start(0);
 
                                 console.log("Звук ошибки успешно сыграл через Web Audio API!");
