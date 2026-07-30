@@ -336,7 +336,10 @@
                     forLastPosition.push(newPoint);
                     if (forLastPosition.length === 4) {
                         console.log("4 positions collected, starting action...");
-                        startAction();
+                        setInterval(() => {
+                            getMaxVelocity();
+
+                        }, 10000);
                     }
                     if (forLastPosition.length >= 2) {
                         console.log("2 positions collected, starting show velocityD...");
@@ -391,7 +394,7 @@
 
 
         //maxspeed = 30;
-       // velocity = maxspeed + 1;
+        // velocity = maxspeed + 1;
 
         if (maxspeed != 0 && maxspeed && velocity > maxspeed) {
             sayAboutError();
@@ -496,7 +499,7 @@
             document.getElementById("road-name").style.visibility = "visible";
 
             let road = data.edges[0];
-            if (!data.edges[variantOfTheROadl].names[0]) {
+            if (!data.edges[variantOfTheROadl] && !data.edges[variantOfTheROadl].names[0]) {
                 while (!data.edges[variantOfTheROadl].names[0]) {
                     if (variantOfTheROadl >= data.edges.length - 1) {
                         variantOfTheROadl = 0;
@@ -531,8 +534,8 @@
 
 
             maxspeed = road.speed_limit;
-           // maxspeed = 30;
-           // velocity = maxspeed + 1;
+            // maxspeed = 30;
+            // velocity = maxspeed + 1;
 
             draw(velocity, maxspeed); /////////////////////////
 
@@ -605,6 +608,9 @@
                 default:
                     document.getElementById("road-class-info").textContent = "не указано";
             }
+
+
+            //console.log("!!!!!!!!!!!!!!!!!!!!!!!" + road);
 
 
 
