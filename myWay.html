@@ -494,13 +494,14 @@
 
     function setroadDats(data) {
         let variantOfTheROadl = 0;
+        let noName=false;
 
         if (data.edges.length > 0) {
             document.getElementById("road-name").style.visibility = "visible";
 
             let road = data.edges[0];
-            if (!data.edges[variantOfTheROadl] && !data.edges[variantOfTheROadl].names[0]) {
-                while (!data.edges[variantOfTheROadl].names[0]) {
+            if (!data?.edges?.[variantOfTheROadl]?.names?.[0]) {
+                while (!data?.edges?.[variantOfTheROadl]?.names?.[0]) {
                     if (variantOfTheROadl >= data.edges.length - 1) {
                         variantOfTheROadl = 0;
                         break;
@@ -512,11 +513,14 @@
                 }
                 else {
                     document.getElementById("road-name-info").textContent = "не указано";
+                    noName=true;
                 }
-                document.getElementById("road-name-info").textContent = data.edges[variantOfTheROadl].names[0];
+                
             }
             else {
-                document.getElementById("road-name-info").textContent = data.edges[0].names[0];//"не указано";
+                
+                document.getElementById("road-name-info").textContent = data.edges[0].names[0];
+                
             }
 
             road = data.edges[variantOfTheROadl];
