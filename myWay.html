@@ -239,6 +239,7 @@
 
     let forLastPosition = [];
     let isAudioOn = false;
+    let isAudioPlaying = false;
 
 
     const divider = document.getElementById("divider");
@@ -394,9 +395,9 @@
 
 
         //maxspeed = 30;
-        // velocity = maxspeed + 1;
+        //velocity = maxspeed + 1;
 
-        if (maxspeed != 0 && maxspeed && velocity > maxspeed) {
+        if (!isAudioPlaying && maxspeed != 0 && maxspeed && velocity > maxspeed) {
             sayAboutError();
         }
     }
@@ -494,7 +495,7 @@
 
     function setroadDats(data) {
         let variantOfTheROadl = 0;
-        let noName=false;
+        let noName = false;
 
         if (data.edges.length > 0) {
             document.getElementById("road-name").style.visibility = "visible";
@@ -513,14 +514,14 @@
                 }
                 else {
                     document.getElementById("road-name-info").textContent = "не указано";
-                    noName=true;
+                    noName = true;
                 }
-                
+
             }
             else {
-                
+
                 document.getElementById("road-name-info").textContent = data.edges[0].names[0];
-                
+
             }
 
             road = data.edges[variantOfTheROadl];
@@ -538,15 +539,15 @@
 
 
             maxspeed = road.speed_limit;
-            // maxspeed = 30;
-            // velocity = maxspeed + 1;
+           // maxspeed = 30;
+           // velocity = maxspeed + 1;
 
             draw(velocity, maxspeed); /////////////////////////
 
 
 
 
-            if (maxspeed != 0 && maxspeed && velocity > maxspeed) {
+            if (!isAudioPlaying && maxspeed != 0 && maxspeed && velocity > maxspeed) {
                 //alert("play audio");
                 sayAboutError();
             }
@@ -673,6 +674,7 @@
     function sayAboutError() {
         if (isAudioOn && audioCtx) {
             //alert("play audio");
+            isAudioPlaying = true;
             let transaction = db.transaction(["audio"], "readonly");
             let store = transaction.objectStore("audio");
 
@@ -711,6 +713,10 @@
                                 source.connect(audioCtx.destination);
 
                                 source.start(0);
+
+                                setTimeout(() => {
+                                    isAudioPlaying = false;
+                                }, audioBuffer.duration * 1000);
 
                                 console.log("Звук ошибки успешно сыграл через Web Audio API!");
                             }, function (err) {
